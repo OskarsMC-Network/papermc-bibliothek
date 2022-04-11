@@ -21,7 +21,7 @@ request with any corrections if any issues are found.
 ### Basic Usage
 
 ```python
-from bibliothek.bibliothek import Bibliothek, BibliothekException
+from bibliothek import Bibliothek, BibliothekException
 
 bibliothek = Bibliothek()  # Create an instance of the Bibliothek class
 try:
