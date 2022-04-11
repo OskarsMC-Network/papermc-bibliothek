@@ -19,7 +19,7 @@ setup(
     url='https://github.com/OskarsMC-Network/papermc-bibliothek',
     packages=["bibliothek"],
     install_requires=[requirements],
-    python_requires='>=3.8',
+    python_requires='>=3.9',
     classifiers=[
         "Environment :: Console",
         "Intended Audience :: Developers",
