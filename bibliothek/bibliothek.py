@@ -238,17 +238,17 @@ class Bibliothek:
                                self._change_data_list_to_change_list(build_dict["changes"]),
                                self._download_data_dict_to_download_dict(build_dict["downloads"]))
 
-    def download_build(self, project_id: str, version: str, build: int, download: str) -> BytesIO:
+    def download_build(self, project_id: str, version: str, build: int, filename: str) -> BytesIO:
         """
         downloads a build
         :param project_id: a valid bibliothek project id
         :param version: a valid bibliothek version for the project
         :param build: a valid bibliothek build
-        :param download: the name of the download, for paper usually `application`
+        :param filename: the name of the download, eg: `paper-1.18.2-286.jar`
         :return: A BytesIO object with the download
         """
         request = self.pool_manager.request("GET",
-                                            f"{self.base_url}projects/{project_id}/versions/{version}/builds/{build}/downloads/{download}",
+                                            f"{self.base_url}projects/{project_id}/versions/{version}/builds/{build}/downloads/{filename}",
                                             preload_content=False)
 
         download_bytesio = BytesIO()

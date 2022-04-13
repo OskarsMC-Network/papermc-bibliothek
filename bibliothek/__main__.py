@@ -103,8 +103,8 @@ def get_build(project_id: str, version: str, build: int) -> None:
 @click.argument("project-id")
 @click.argument("version")
 @click.argument("build", type=click.INT)
-@click.argument("download", default="application")
-def download_build(project_id: str, version: str, build: int, download: str) -> None:
+@click.argument("filename")
+def download_build(project_id: str, version: str, build: int, filename: str) -> None:
     bibliothek = Bibliothek()
 
     bibliothek_build = bibliothek.get_build(project_id, version, build)
@@ -117,15 +117,22 @@ def download_build(project_id: str, version: str, build: int, download: str) -> 
     )
 
     with click.progressbar(length=2, label=f"Downloading {project_id}/{version}@{build}") as bar:
-        downloaded_build = bibliothek.download_build(project_id, version, build, download)
+        bar.update(1)
+        downloaded_build = bibliothek.download_build(project_id, version, build, filename)
         bar.update(2)
         bar.finish()
 
-    hashes = bibliothek.check_hash(downloaded_build.getvalue(), bibliothek_build.downloads[download].sha256)
+    hash_to_compare = None
+    for download_key in bibliothek_build.downloads.keys():
+        if bibliothek_build.downloads[download_key].name == filename:
+            hash_to_compare = bibliothek_build.downloads[download_key].sha256
+
+    if hash_to_compare is None:
+        raise Exception("Download not found.")
+
+    hashes = bibliothek.check_hash(downloaded_build.getvalue(), hash_to_compare)
 
     print(f"Matching Hashes: {hashes}")
-
-    filename = bibliothek_build.downloads[download].name
 
     with open(filename, 'wb') as handle:
         handle.write(downloaded_build.getvalue())
