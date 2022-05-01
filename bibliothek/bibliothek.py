@@ -98,7 +98,7 @@ class BibliothekException(Exception):
 
 class UnexpectedResponseBibliothekException(Exception):
     def __init__(self, response: urllib3.response.HTTPResponse):
-        self.response = response
+        self.response: urllib3.response.HTTPResponse = response
         super().__init__()
 
     def __str__(self):
