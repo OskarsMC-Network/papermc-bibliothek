@@ -91,10 +91,18 @@ class BibliothekException(Exception):
 class UnexpectedResponseBibliothekException(Exception):
     def __init__(self, response: urllib3.response.HTTPResponse):
         self.response: urllib3.response.HTTPResponse = response
+
+        self._end = self.response.data
+
+        if self.response.status == 404:
+            self._end = "Error: " + json.loads(self._end.decode('utf-8'))["error"]
+        else:
+            self._end = "Data: " + self._end
+
         super().__init__()
 
     def __str__(self):
-        return f"HTTP Code: {self.response.status}, expected 200. Data: {self.response.data.decode('utf-8')}"
+        return f"HTTP Code: {self.response.status}, expected 200. {self._end}"
 
 
 class Bibliothek:
@@ -207,7 +215,7 @@ class Bibliothek:
         version_dict = json.loads(response.data)
 
         return BibliothekVersionBuilds(version_dict["project_id"], version_dict["project_name"],
-                                 version_dict["version"], version_dict["builds"])
+                                       version_dict["version"], version_dict["builds"])
 
     def get_build(self, project_id: str, version: str, build: int) -> BibliothekBuild:
         """
