@@ -106,12 +106,12 @@ class UnexpectedResponseBibliothekException(Exception):
 
 
 class Bibliothek:
-    def __init__(self, base_url: str = PAPER_INSTANCE) -> None:
+    def __init__(self, base_url: str = PAPER_INSTANCE, user_agent: str = f'papermc-bibliothek/{__version__}') -> None:
         """
         Create a Bibliothek instance
         :param base_url: Base URL for the API client, default is the papermc instance.
         """
-        self.pool_manager = urllib3.PoolManager(headers={'User-Agent': f'papermc-bibliothek/{__version__}'})
+        self.pool_manager = urllib3.PoolManager(headers={'User-Agent': user_agent})
         self.base_url = base_url
 
     @staticmethod
