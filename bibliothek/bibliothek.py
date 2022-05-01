@@ -72,14 +72,6 @@ class BibliothekVersionBuilds:
 
 
 @dataclasses.dataclass()
-class BibliothekVersion:
-    project_id: str
-    project_name: str
-    version: str
-    builds: List[int]
-
-
-@dataclasses.dataclass()
 class BibliothekBuild:
     project_id: str
     project_name: str
@@ -200,7 +192,7 @@ class Bibliothek:
                                             version_group_builds_dict["version_group"],
                                             version_group_builds_dict["versions"], builds)
 
-    def get_version(self, project_id: str, version: str) -> BibliothekVersion:
+    def get_version_builds(self, project_id: str, version: str) -> BibliothekVersionBuilds:
         """
         Get a bibliothek version
         :param project_id: a valid bibliothek project id
@@ -214,7 +206,7 @@ class Bibliothek:
 
         version_dict = json.loads(response.data)
 
-        return BibliothekVersion(version_dict["project_id"], version_dict["project_name"],
+        return BibliothekVersionBuilds(version_dict["project_id"], version_dict["project_name"],
                                  version_dict["version"], version_dict["builds"])
 
     def get_build(self, project_id: str, version: str, build: int) -> BibliothekBuild:
