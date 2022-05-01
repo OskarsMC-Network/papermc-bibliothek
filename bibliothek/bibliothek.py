@@ -259,6 +259,10 @@ class Bibliothek:
             download_bytesio.write(data)
 
         request.release_conn()
+
+        if request.status != 200:
+            raise UnexpectedResponseBibliothekException(request)
+
         return download_bytesio
 
     @staticmethod
