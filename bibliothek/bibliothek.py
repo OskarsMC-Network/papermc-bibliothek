@@ -11,7 +11,7 @@ import urllib3
 
 __version__ = importlib.metadata.version('papermc-bibliothek')
 
-PAPER_INSTANCE = 'https://papermc.io/api/v2/'
+PAPER_INSTANCE = 'https://api.papermc.io/v2/'
 
 
 @dataclasses.dataclass()
