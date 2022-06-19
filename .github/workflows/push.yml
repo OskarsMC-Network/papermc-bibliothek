@@ -8,6 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v2
       - name: "Setup 💾"
         run: rm -rf ./build ./dist || true
       - name: "Build package 🏗"

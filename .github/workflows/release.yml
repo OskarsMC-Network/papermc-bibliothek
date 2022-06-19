@@ -20,6 +20,6 @@ jobs:
         run: python -m twine upload dist/* --username __token__ --password ${{ secrets.PYPI_TOKEN }}
       - name: "Release to Github Releases 🛫"
         uses: ncipollo/release-action@v1
-          with:
-            tag: ${{ steps.random-color-generator.outputs.VERSION }}
-            body: https://pypi.org/project/papermc-bibliothek/${{ steps.random-color-generator.outputs.VERSION }}
+        with:
+          tag: ${{ steps.random-color-generator.outputs.VERSION }}
+          body: https://pypi.org/project/papermc-bibliothek/${{ steps.random-color-generator.outputs.VERSION }}
