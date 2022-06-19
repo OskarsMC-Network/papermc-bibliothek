@@ -10,12 +10,18 @@ jobs:
     steps:
       - name: "Checkout Repository"
         uses: actions/checkout@v2
+      - name: "Set up Python 🐍"
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
       - name: "Clean Up 💾"
         run: rm -rf ./build ./dist || true
       - name: "Get version 📑"
         run: ::set-output name=VERSION::python setup.py --version
       - name: "Build package 🏗"
         run: python setup.py sdist bdist_wheel
+      - name: "Install twine 🔻"
+        run: python -m pip install --user --upgrade twine
       - name: "Publish package 📦"
         run: python -m twine upload dist/* --username __token__ --password ${{ secrets.PYPI_TOKEN }}
       - name: "Release to Github Releases 🛫"
