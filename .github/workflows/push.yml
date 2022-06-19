@@ -1,0 +1,16 @@
+name: Publish papermc-bibliothek to test pypi
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup 💾"
+        run: rm -r ./build ./dist
+      - name: "Build package 🏗"
+        run: python setup.py sdist bdist_wheel
+      - name: "Publish package 🛫"
+        run: python -m twine upload --repository testpypi dist/* --username __token__ --password ${{ PYPI_TEST_TOKEN }}

@@ -1,0 +1,25 @@
+name: Publish papermc-bibliothek to PyPI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v2
+      - name: "Clean Up 💾"
+        run: rm -r ./build ./dist
+      - name: "Get version 📑"
+        run: ::set-output name=VERSION::python setup.py --version
+      - name: "Build package 🏗"
+        run: python setup.py sdist bdist_wheel
+      - name: "Publish package 📦"
+        run: python -m twine upload dist/* --username __token__ --password ${{ PYPI_TOKEN }}
+      - name: "Release to Github Releases 🛫"
+        uses: ncipollo/release-action@v1
+          with:
+            tag: ${{ steps.random-color-generator.outputs.VERSION }}
+            body: https://pypi.org/project/papermc-bibliothek/${{ steps.random-color-generator.outputs.VERSION }}
