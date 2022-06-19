@@ -1,8 +1,8 @@
 name: Publish papermc-bibliothek to PyPI
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
       - name: "Build package 🏗"
         run: python setup.py sdist bdist_wheel
       - name: "Publish package 📦"
-        run: python -m twine upload dist/* --username __token__ --password ${{ PYPI_TOKEN }}
+        run: python -m twine upload dist/* --username __token__ --password ${{ secrets.PYPI_TOKEN }}
       - name: "Release to Github Releases 🛫"
         uses: ncipollo/release-action@v1
           with:
