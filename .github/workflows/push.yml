@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Setup 💾"
-        run: rm -r ./build ./dist
+        run: rm -rf ./build ./dist || true
       - name: "Build package 🏗"
         run: python setup.py sdist bdist_wheel
       - name: "Publish package 🛫"
