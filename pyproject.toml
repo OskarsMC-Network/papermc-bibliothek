@@ -1,10 +1,13 @@
 [tool.poetry]
 name = "papermc-bibliothek"
 packages = [{ include = "bibliothek" }]
-version = "4.0.0"
+version = "4.0.1"
 description = "bibliothek API client with CLI"
 authors = ["Oskar <56176746+OskarZyg@users.noreply.github.com>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/OskarsMC-Network/papermc-bibliothek"
+homepage = "https://github.com/OskarsMC-Network/papermc-bibliothek"
 
 [tool.poetry.scripts]
 bibliothek = "bibliothek.__main__:app"
