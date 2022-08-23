@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "papermc-bibliothek"
+packages = [{ include = "bibliothek" }]
+version = "4.0.0"
+description = "bibliothek API client with CLI"
+authors = ["Oskar <56176746+OskarZyg@users.noreply.github.com>"]
+license = "MIT"
+
+[tool.poetry.scripts]
+bibliothek = "bibliothek.__main__:app"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+typer = { extras = ["all"], version = "^0.6.1" }
+urllib3 = "^1.26.12"
+python-dateutil = "^2.8.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

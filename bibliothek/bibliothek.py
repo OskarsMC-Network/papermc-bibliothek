@@ -4,12 +4,19 @@ import hashlib
 import importlib.metadata
 import json
 from io import BytesIO
+from json import JSONDecodeError
 from typing import List, Dict
 
 import dateutil.parser
 import urllib3
 
-__version__ = importlib.metadata.version('papermc-bibliothek')
+try:
+    __version__ = importlib.metadata.version('papermc-bibliothek')
+except importlib.metadata.PackageNotFoundError:
+    try:
+        __version__ = importlib.metadata.version('bibliothek')
+    except importlib.metadata.PackageNotFoundError:
+        __version__ = "0.0.0"
 
 PAPER_INSTANCE = 'https://api.papermc.io/v2/'
 
@@ -95,7 +102,10 @@ class UnexpectedResponseBibliothekException(Exception):
         self._end = self.response.data
 
         if self.response.status == 404:
-            self._end = "Error: " + json.loads(self._end.decode('utf-8'))["error"]
+            try:
+                self._end = "Error: " + json.loads(self._end.decode('utf-8'))["error"]
+            except JSONDecodeError:
+                self._end = "Data: " + str(self._end)
         else:
             self._end = "Data: " + self._end
 

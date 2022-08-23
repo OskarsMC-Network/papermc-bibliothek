@@ -1,23 +1,26 @@
-import click
+import typer
 
 from bibliothek.bibliothek import Bibliothek
 
-
-@click.help_option()
-@click.group()
-def main() -> None:
-    pass
+app = typer.Typer()
 
 
-@main.command()
+@app.callback()
+def callback():
+    """
+
+    :return:
+    """
+
+
+@app.command()
 def get_projects() -> None:
     bibliothek = Bibliothek()
     projects_list = ', '.join(bibliothek.get_projects())
     print(f"Available projects: {projects_list}")
 
 
-@main.command()
-@click.argument("project-id")
+@app.command()
 def get_project(project_id: str) -> None:
     bibliothek = Bibliothek()
     project = bibliothek.get_project(project_id)
@@ -29,9 +32,7 @@ def get_project(project_id: str) -> None:
     )
 
 
-@main.command()
-@click.argument("project-id")
-@click.argument("version-group")
+@app.command()
 def get_version_group(project_id: str, version_group: str) -> None:
     bibliothek = Bibliothek()
     bibliothek_version_group = bibliothek.get_version_group(project_id, version_group)
@@ -43,9 +44,7 @@ def get_version_group(project_id: str, version_group: str) -> None:
     )
 
 
-@main.command()
-@click.argument("project-id")
-@click.argument("version-group")
+@app.command()
 def get_version_group_builds(project_id: str, version_group: str) -> None:
     bibliothek = Bibliothek()
     version_group_builds = bibliothek.get_version_group_builds(project_id, version_group)
@@ -58,12 +57,10 @@ def get_version_group_builds(project_id: str, version_group: str) -> None:
     )
 
 
-@main.command()
-@click.argument("project-id")
-@click.argument("version")
+@app.command()
 def get_version(project_id: str, version: str) -> None:
     bibliothek = Bibliothek()
-    bibliothek_version = bibliothek.get_version(project_id, version)
+    bibliothek_version = bibliothek.get_version_builds(project_id, version)
     print(
         f"Project ID: {bibliothek_version.project_id}\n"
         f"Project Name: {bibliothek_version.project_name}\n"
@@ -72,10 +69,7 @@ def get_version(project_id: str, version: str) -> None:
     )
 
 
-@main.command()
-@click.argument("project-id")
-@click.argument("version")
-@click.argument("build", type=click.INT)
+@app.command()
 def get_build(project_id: str, version: str, build: int) -> None:
     bibliothek = Bibliothek()
     bibliothek_build = bibliothek.get_build(project_id, version, build)
@@ -95,15 +89,11 @@ def get_build(project_id: str, version: str, build: int) -> None:
         f"Changes:\n" +
         '\n'.join(changes) +
         "\n\n"
-        f"Downloads: {', '.join(bibliothek_build.downloads.keys())}"
+        f"Downloads: {', '.join([bibliothek_build.downloads[download].name for download in bibliothek_build.downloads.keys()])}"
     )
 
 
-@main.command()
-@click.argument("project-id")
-@click.argument("version")
-@click.argument("build", type=click.INT)
-@click.argument("filename")
+@app.command()
 def download_build(project_id: str, version: str, build: int, filename: str) -> None:
     bibliothek = Bibliothek()
 
@@ -116,7 +106,7 @@ def download_build(project_id: str, version: str, build: int, filename: str) -> 
         f"Promoted: {bibliothek_build.promoted}"
     )
 
-    with click.progressbar(length=2, label=f"Downloading {project_id}/{version}@{build}") as bar:
+    with typer.progressbar(length=2, label=f"Downloading {project_id}/{version}@{build}") as bar:
         bar.update(1)
         downloaded_build = bibliothek.download_build(project_id, version, build, filename)
         bar.update(2)
@@ -138,3 +128,7 @@ def download_build(project_id: str, version: str, build: int, filename: str) -> 
         handle.write(downloaded_build.getvalue())
 
     print(f"File saved as {filename}")
+
+
+if __name__ == '__main__':
+    app()
