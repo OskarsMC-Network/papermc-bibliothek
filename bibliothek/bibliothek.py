@@ -282,7 +282,10 @@ class Bibliothek:
                 break
             download_bytesio.write(data)
             if progress_callback:
-                progress_callback(download_bytesio.getbuffer().nbytes, request.headers.get("Content-Length"))
+                length = request.headers.get("Content-Length")
+                if length:
+                    length = int(length)
+                progress_callback(download_bytesio.getbuffer().nbytes, length)
 
         request.release_conn()
 

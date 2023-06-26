@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "papermc-bibliothek"
 packages = [{ include = "bibliothek" }]
-version = "6.0.0"
+version = "6.0.1"
 description = "bibliothek API client with CLI"
 authors = ["Oskar <56176746+OskarZyg@users.noreply.github.com>"]
 license = "MIT"
