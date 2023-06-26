@@ -5,7 +5,7 @@ import importlib.metadata
 import json
 from io import BytesIO
 from json import JSONDecodeError
-from typing import List, Dict
+from typing import List, Dict, Callable
 
 import dateutil.parser
 import urllib3
@@ -96,8 +96,8 @@ class BibliothekException(Exception):
 
 
 class UnexpectedResponseBibliothekException(Exception):
-    def __init__(self, response: urllib3.response.HTTPResponse):
-        self.response: urllib3.response.HTTPResponse = response
+    def __init__(self, response: urllib3.response.BaseHTTPResponse):
+        self.response = response
 
         self._end = self.response.data
 
@@ -107,7 +107,7 @@ class UnexpectedResponseBibliothekException(Exception):
             except JSONDecodeError:
                 self._end = "Data: " + str(self._end)
         else:
-            self._end = "Data: " + self._end
+            self._end = "Data: " + str(self._end)
 
         super().__init__()
 
@@ -144,11 +144,12 @@ class Bibliothek:
         Get the list of projects
         :return: A List of projects
         """
-        response = self.pool_manager.request("GET", f"{self.base_url}projects")
+        url = f"{self.base_url}projects"
+        response = self.pool_manager.request("GET", url)
         if response.status != 200:
             raise UnexpectedResponseBibliothekException(response)
 
-        return json.loads(response.data)["projects"]
+        return response.json()["projects"]
 
     def get_project(self, project_id: str) -> BibliothekProject:
         """
@@ -156,11 +157,14 @@ class Bibliothek:
         :param project_id: a valid bibliothek project id
         :return: The bibliothek project
         """
-        response = self.pool_manager.request("GET", f"{self.base_url}projects/{project_id}")
-        if response.status != 200:
-            raise UnexpectedResponseBibliothekException(response.status)
 
-        project_dict = json.loads(response.data)
+        # https://papermc.io/api/docs/swagger-ui/index.html?configUrl=/api/openapi/swagger-config#/projects-controller/projects
+        url = f"{self.base_url}projects/{project_id}"
+        response = self.pool_manager.request("GET", url)
+        if response.status != 200:
+            raise UnexpectedResponseBibliothekException(response)
+
+        project_dict = response.json()
 
         return BibliothekProject(project_dict["project_id"], project_dict["project_name"],
                                  project_dict["version_groups"], project_dict["versions"])
@@ -172,12 +176,14 @@ class Bibliothek:
         :param version_group: a valid bibliothek version group
         :return: A bibliothek version group object
         """
-        response = self.pool_manager.request("GET",
-                                             f"{self.base_url}projects/{project_id}/version_group/{version_group}")
+
+        # https://papermc.io/api/docs/swagger-ui/index.html?configUrl=/api/openapi/swagger-config#/project-controller/project
+        url = f"{self.base_url}projects/{project_id}/version_group/{version_group}"
+        response = self.pool_manager.request("GET", url)
         if response.status != 200:
             raise UnexpectedResponseBibliothekException(response)
 
-        version_group_dict = json.loads(response.data)
+        version_group_dict = response.json()
 
         return BibliothekVersionGroup(version_group_dict["project_id"], version_group_dict["project_name"],
                                       version_group_dict["version_group"], version_group_dict["versions"])
@@ -189,16 +195,17 @@ class Bibliothek:
         :param version_group: a valid version group
         :return: a bibliothek version group builds object
         """
-        response: urllib3.response.HTTPResponse = self.pool_manager.request("GET",
-                                                                            f"{self.base_url}projects/{project_id}/version_group/{version_group}/builds")
+
+        # https://papermc.io/api/docs/swagger-ui/index.html?configUrl=/api/openapi/swagger-config#/version-family-builds-controller/familyBuilds
+        url = f"{self.base_url}projects/{project_id}/version_group/{version_group}/builds"
+        response = self.pool_manager.request("GET", url)
         if response.status != 200:
             raise UnexpectedResponseBibliothekException(response)
 
-        version_group_builds_dict = json.loads(response.data)
+        version_group_builds_dict = response.json()
 
         builds = []
-        for build in version_group_builds_dict[
-            "builds"]:
+        for build in version_group_builds_dict["builds"]:
             builds.append(
                 BibliothekVersionGroupBuild(build["version"], build["build"], dateutil.parser.parse(build["time"]),
                                             build["channel"], build["promoted"],
@@ -217,12 +224,14 @@ class Bibliothek:
         :param version: a valid version for the provided project id
         :return: a bibliothek version object
         """
-        response = self.pool_manager.request("GET",
-                                             f"{self.base_url}projects/{project_id}/versions/{version}")
+
+        # https://papermc.io/api/docs/swagger-ui/index.html?configUrl=/api/openapi/swagger-config#/version-builds-controller/builds
+        url = f"{self.base_url}projects/{project_id}/versions/{version}"
+        response = self.pool_manager.request("GET", url)
         if response.status != 200:
             raise UnexpectedResponseBibliothekException(response)
 
-        version_dict = json.loads(response.data)
+        version_dict = response.json()
 
         return BibliothekVersionBuilds(version_dict["project_id"], version_dict["project_name"],
                                        version_dict["version"], version_dict["builds"])
@@ -235,12 +244,14 @@ class Bibliothek:
         :param build: a valid bibliothek build for the version on the project
         :return: a bibliothek build object
         """
-        response: urllib3.response.HTTPResponse = self.pool_manager.request("GET",
-                                                                            f"{self.base_url}projects/{project_id}/versions/{version}/builds/{build}")
+
+        # https://papermc.io/api/docs/swagger-ui/index.html?configUrl=/api/openapi/swagger-config#/version-build-controller/build
+        url = f"{self.base_url}projects/{project_id}/versions/{version}/builds/{build}"
+        response = self.pool_manager.request("GET", url)
         if response.status != 200:
             raise UnexpectedResponseBibliothekException(response)
 
-        build_dict = json.loads(response.data)
+        build_dict = response.json()
 
         return BibliothekBuild(build_dict["project_id"], build_dict["project_name"],
                                build_dict["version"], build_dict["build"], dateutil.parser.parse(build_dict["time"]),
@@ -248,18 +259,21 @@ class Bibliothek:
                                self._change_data_list_to_change_list(build_dict["changes"]),
                                self._download_data_dict_to_download_dict(build_dict["downloads"]))
 
-    def download_build(self, project_id: str, version: str, build: int, filename: str) -> BytesIO:
+    def download_build(self, project_id: str, version: str, build: int, filename: str,
+                       progress_callback: Callable[[int, int or None], None] = None) -> BytesIO:
         """
         downloads a build
         :param project_id: a valid bibliothek project id
         :param version: a valid bibliothek version for the project
         :param build: a valid bibliothek build
         :param filename: the name of the download, eg: `paper-1.18.2-286.jar`
+        :param progress_callback: A callback for when the download advances. Params (in bytes): downloaded, total
         :return: A BytesIO object with the download
         """
-        request = self.pool_manager.request("GET",
-                                            f"{self.base_url}projects/{project_id}/versions/{version}/builds/{build}/downloads/{filename}",
-                                            preload_content=False)
+
+        # https://papermc.io/api/docs/swagger-ui/index.html?configUrl=/api/openapi/swagger-config#/download-controller/download
+        url = f"{self.base_url}projects/{project_id}/versions/{version}/builds/{build}/downloads/{filename}"
+        request = self.pool_manager.request("GET", url, preload_content=False)
 
         download_bytesio = BytesIO()
         while True:
@@ -267,6 +281,8 @@ class Bibliothek:
             if not data:
                 break
             download_bytesio.write(data)
+            if progress_callback:
+                progress_callback(download_bytesio.getbuffer().nbytes, request.headers.get("Content-Length"))
 
         request.release_conn()
 

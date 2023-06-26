@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "papermc-bibliothek"
 packages = [{ include = "bibliothek" }]
-version = "4.0.1"
+version = "6.0.0"
 description = "bibliothek API client with CLI"
 authors = ["Oskar <56176746+OskarZyg@users.noreply.github.com>"]
 license = "MIT"
@@ -9,14 +9,10 @@ readme = "README.md"
 repository = "https://github.com/OskarsMC-Network/papermc-bibliothek"
 homepage = "https://github.com/OskarsMC-Network/papermc-bibliothek"
 
-[tool.poetry.scripts]
-bibliothek = "bibliothek.__main__:app"
-
 [tool.poetry.dependencies]
 python = "^3.9"
-typer = { extras = ["all"], version = "^0.6.1" }
-urllib3 = "^1.26.12"
 python-dateutil = "^2.8.2"
+urllib3 = "^2.0.3"
 
 [tool.poetry.dev-dependencies]
 
